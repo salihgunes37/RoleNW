@@ -1,0 +1,336 @@
+const  Discord  =  zorunlu ( ' discord.js ' );
+const { stripIndents } =  gerektirir ( ' ortak-etiketler ' );
+const { randomRange , kontrol } =  gerektirir ( ' ../util/Util.js ' );
+
+ihracat . run  =  async ( istemci , mesaj , args ) => {
+  
+  bu . fighting  =  new  Set ();
+  
+	rakibinize izin verin =  mesaj . bahseder . Kullanıcılar . ilk ()
+	eğer ( ! rakip) dönüş  mesajı . cevap ( " Oynamak istediğin kişiyi etiketlemelisin! " )
+  
+  eğer ( rakip . bot ) dönüş  mesajı . cevap ver ( ' Botlar ile oynayamazsın! ' );
+  eğer ( rakip . id  ===  mesajı . yazar . id ) dönüş  mesajı . cevap ( ' Kendin ile düello atamazsın! ' );
+		if ( this . fighting . has ( mesaj . channel . id )) dönüş  mesajı . cevap ver ( ' Kanal başına sadece bir düello anında gelebilir. ' );
+		bu . mücadele . ekle ( mesaj . kanal . kimliği );
+		dene {
+			if ( ! rakibi . bot ) {
+                bekliyor  mesajı . Kanal . gönder ( ` $ { rakip } , düello iste geldi. Düello'yu kabul ediyor musun? ( \` evet \ ` veya \` hayır \ ` olarak cevap veriniz.) ` );
+				const  doğrulama  =  bekliyor  doğrulamak ( mesajı . kanalı , rakip);
+				if ( ! doğrulama) {
+					bu . mücadele . sil ( mesaj . kanal . kimliği );
+					return  mesajı . Kanal . Gönder ( ` Düello kabul edilmedi ... ` );
+				}
+			}
+			izin userHP =  500 ;
+			izin oppoHP =  500 ;
+			izin userTurn =  yanlış ;
+			let bekçi =  false ;
+			const  reset  = ( changeGuard  =  true ) => {
+				userTurn =  ! userTurn;
+				if (changeGuard && guard) guard =  false ;
+			};
+			const  dealDamage  =  hasar  => {
+				eğer (userTurn) oppoHP - = hasar;
+				başka userHP - = hasar;
+			};
+			const  forfeit  = () => {
+				if (userTurn) userHP =  0 ;
+				aksi takdirde oppoHP =  0 ;
+			};
+			while (userHP >  0  && oppoHP >  0 ) { // eslint-devre dışı bırakma çizgisi değiştirilmemiş çevrim-koşulu
+				const  user  = userTurn ?  mesajı . Yazar  : rakip;
+				seçim yapalım ;
+				if ( ! rakip . bot  || ( rakip . bot  && userTurn)) {
+					bekliyor  mesajı . Kanal . Gönder (stripIndents `
+						$ { user } , ne yapmak istersin? \ ` saldır \` , \ ` savun \` , \ ` ultra güç \` , veya \ ` kaç \` ?
+						** $ { mesaj . yazar . kullanıcı adı } **: $ { userHP } : kalp atışı:
+						** $ { rakip . kullanıcı adı } **: $ { oppoHP } : yürek:
+					` );
+					const  filter  =  res  =>
+						res . yazar . kimliği  ===  kullanıcı . id  && [ ' saldır ' , ' savun ' , ' ultra güç ' , ' kaç ' ]. içerir ( res . içerik . toLowerCase ());
+					const  turn  =  mesajı bekliyor  . Kanal . awaitMessages (filtre, {
+						maksimum :  1 ,
+						zaman :  30000
+					});
+					if ( ! turn . size ) {
+						bekliyor  mesajı . cevap ( ` Üzgünüm ama, süre doldu! ` );
+						reset ();
+						devam et ;
+					}
+					seçim =  dönüş . ilk (). içerik . toLowerCase ();
+				} else {
+					const  choices  = [ ' saldır ' , ' savun ' , ' ultra güç ' ];
+					seçim = seçimler [ Matematik . kat ( Matematik . rastgele () *  seçimler . uzunluk )];
+				}
+				if (choice ===  ' saldır ' ) {
+					const  hasarı  =  Matematik . kat ( Matematik . rastgele () * (bekçi -  10  :  100 )) +  1 ;
+					bekliyor  mesajı . Kanal . send ( ` $ { user } , ** $ { damage } ** hasar vurdu! ` );
+					dealDamage (hasar);
+					reset ();
+				} else  eğer (choice ===  ' savun ' ) {
+					bekliyor  mesajı . Kanal . Gönder ( ` $ { user } , süper kalkan ile savundu! ` );
+					bekçi =  doğru ;
+					sıfırlama ( yanlış );
+				} else  eğer (seçenek ===  ' ultra güç ' ) {
+					const  miss  =  Matematik . kat ( Matematik . rastgele () *  4 );
+					if ( ! miss) {
+						const  hasarı  =  randomRange ( 100 , bekçi -  150  :  300 );
+						bekliyor  mesajı . Kanal . gönder ( ` $ { user } , Çoook uzak galaksilerden gelen ultra sonik enerjiyi yeterkiyle ilgili topladın ve ** $ { damage } ** hasar vurdun !! ` );
+						dealDamage (hasar);
+					} else {
+						bekliyor  mesajı . Kanal . gönder ( ` $ { user } , Çoook uzak galaksilerden gelen ultra sonik enerjiyi toplamak gerekir toplayamadığın için ulta güç kullanamadın! ` );
+					}
+					reset ();
+				} else  eğer (seçenek ===  ' kaç ' ) {
+					bekliyor  mesajı . Kanal . Gönder ( ` $ { user } , kaçtı! Korkak! ` );
+					ceza ();
+					mola ;
+				} else {
+					bekliyor  mesajı . cevap ( ' Ne yapmak istediğini anlamadım. ' );
+				}
+			}
+			bu . mücadele . sil ( mesaj . kanal . kimliği );
+            const  winner  = userHP > oppoHP ?  mesajı . Yazar  : rakip;
+			return  mesajı . Kanal . gönder ( ` Oyun bitti! Tebrikler, ** $ { winner } ** kazandı! \ n ** $ { message . yazar . kullanıcı adı } **: $ { userHP } : heartpulse: \ n ** $ { rakip . kullanıcı adı } **: $ { oppoHP } : kalp atışı: ` );
+		} yakalamak (err) {
+			bu . mücadele . sil ( mesaj . kanal . kimliği );
+			hata atmak ;
+		}
+  }
+
+ihracat . conf  = {
+  etkin :  doğru ,
+  guildOnly :  false ,
+  takma adlar : [ ' 1vs1 ' , ' 1v1 ' , ' savaş ' ],
+  permLevel :  ` Yetki gerekmiyor. '
+};
+
+ihracat . yardım  = {
+  adı :  ' düello ' ,
+  kategori :  " eğlence " ,
+  açıklama :  ' İstediğiniz bir kişi ile düello atarsınız! ' ,
+  kullanım :  ' düello <@ kullanıcı> '
+};
+const  Discord  =  zorunlu ( " discord.js " )
+ihracat . run  = ( bot , mesaj ) => {
+  const  guildArray  =  bot . guildler . dizi ()
+  while ( guildArray . uzunluk ) {
+    const  embed  =  new  Discord.RichEmbed ();
+    const  guild'ler  =  guildArray . ek yeri ( 0 , 25 );
+    için ( const  Guild  ait loncalarda) {
+      Yerleştirme . addField ( ` ** $ { guild . name } ** - ÜYE SAYISI: ** $ { guild . memberCount } ** ` , guild . id );
+      Yerleştirme . setColor ( ' # D97634 ' )
+      Yerleştirme . setTitle ( ' Ailemiz ' )
+      Yerleştirme . AyarAçıklaması ( ` Büyük Bir ailedeyiz!. Ailemde ** $ { bot . loncalar . boyut } ** Kadar sunucu var! (Gnarge) ` )
+      mesajı . delete ();
+    }
+    mesajı . Kanal . send ({embed : embed});
+  }
+}
+
+ihracat . conf  = {
+  etkin :  doğru ,
+  guildOnly :  false ,
+  takma adlar : [ ' s ' , ' konuş ' , ' sohbet ' , ' sor ' ],
+  permLevel :  0
+};
+
+ihracat . yardım  = {
+  İsim :  " ailemiz " ,
+  açıklama :  " Botun içinde bulunduğu tüm sunucuları gösterir. " ,
+  kullanım :  " ailemiz "
+};
+
+const  Discord  =  zorunlu ( ' discord.js ' );
+const  hastebin  =  zorunlu ( ' hastebin-gen ' );
+ihracat . çalıştırmak  =  zaman uyumsuz ( istemci , mesaj , args , üye ) => {
+    if ( message . channel . type  ==  " dm " )   return ;
+  if ( message . channel . type  ! ==  " text " ) return ;
+  eğer ( ! args [ 0 ]) dönüş  mesajı . Kanal . gönder ( " ** Hata: ** Lütfen ** Bu Kanalda Yazılmış ** bir mesajın id'sini girin! " )
+  Eğer (prmtr [ 0 ] <  18 ) dönüş  mesajı . Kanal . gönder ( " ** Hata: ** Lütfen ** Bu Kanalda Yazılmış ** bir mesajın id'sini girin! " )
+  
+   izin sayısı = [ " 1 " , " 2 " , " 3 " , " 4 " , " 5 " , " 6 " , " 7 " , " 8 " , " 9 " , " 0 " ]
+    
+    if ( ! number . some ( word  =>  message . content . içerir (word))) {
+           {
+                  return  mesajı . Kanal . gönder ( " ** Hata: ** Lütfen ** Bu Kanalda Yazılmış ** bir mesajın id'sini girin! " );
+           }}   
+  
+  mesajı . Kanal . fetchMessage ([ 0 ] args ). sonra ( dest  => {
+   hastebin ( dest . içeriği , " metin " ). sonra ( r  => {
+     var hastLink = r
+embed =  new  Discord.RichEmbed () işlevine izin verin
+. setAuthor ( ` Bir Mesaj Alıntılandı! ` )
+. setDescription ( ` ** Mesaj Sahibi: ** $ { dest . yazar . etiketi } \ n ** Mesaj İçeriği: ** $ { dest . içerik } \ n ** Mesaj Linki: ** [Tıkla] ( $ { hastLink } ) ` )
+. setColor ( " RANDOM " )
+. setFooter ( ` $ { mesajı . Yazar . tag } Tarafından istendi ` , mesaj . yazar . avatarURL )
+mesajı . Kanal . gönder (yerleştir)
+}
+)}). yakalamak ( err  => {
+    
+ if ( err . name  ===  ' DiscordAPIError '  &&  err . message  ===  ' Bilinmeyen Mesaj ' ) {
+       mesajı . Kanal . gönder ( " ** Hata: ** Lütfen ** Bu Kanalda Yazılmış ** bir mesajın id'sini girin! " );
+   }
+})}
+ihracat . conf  = {
+  etkin :  doğru ,
+  guildOnly :  false ,
+  takma adlar : [ ' alinti ' , ' alıntıla ' , ' alintila ' , ' alıntı ' , ' qt ' ],
+  permLevel :  0 ,
+};
+ihracat . yardım  = {
+  adı :  ' alıntı ' ,
+  açıklaması :  ' Bir Mesaj Alıntılar. ' ,
+  kullanım :  ' g! alıntı mesaj id '
+};
+
+const  Discord  =  zorunlu ( ' discord.js ' );
+
+ihracat . run  =  async ( müşteri , mesaj , params ) => {
+    if ( message . channel . type  ==  " dm " )   return ;
+  if ( message . channel . type  ! ==  " text " ) return ;
+  var kanal =  istemci . kanallar . Bul ( ' id ' , ' 540269834835853340 ' )
+    const  asdf  =  müşteriyi bekliyor  . kanallar . almak ( mesaj . kanal . kimliği ). createInvite ()
+  mesajı . delete ();
+  const  embed  =  yeni  Discord.RichEmbed ()
+  . setTitle ( " » Bot | Canlı Destek " )
+  . setDescription ( " ** Canlı Desteği kullandğın için teşekkür ederiz, Seninle ekibim ilgilenicektir lütfen bekle! ** " )
+  . setFooter ( " 30 Saniye içinde geri dönülmezse lütfen buraya gelin <@ 485741578615521291> " )
+ mesajı . Kanal . gönder (yerleştir)
+      const  invite  =  yeni  Discord.RichEmbed ()
+  . setAuthor ( " » Canlı Destek | Talep " )
+  . addField ( ' ** »Kullanıcı Adı: ** ' , mesaj . yazar . kullanıcı adı  +  ' # '  +  mesaj . yazar . ayrımcı )
+  . addField ( ' ** »Sunucu Adı: ** ' , mesaj . lonca . adı )
+  . setDescription ( asdf . url )
+      Kanal . gönder (davet et)
+};
+  
+  ihracat . conf  = {
+  etkin :  doğru ,
+  guildOnly :  false ,
+  takma adlar : [ ' canlıdestek ' ],
+  permLevel :  0
+};
+
+ihracat . yardım  = {
+  İsim :  ' canlı-destek ' ,
+  açıklaması :  ' Canlı Destek Tablebi Oluşturur. ' ,
+  kullanım :  ' g! canlı-destek '
+};
+
+const  Discord  =  zorunlu ( ' discord.js ' );
+
+ihracat . run  = ( müşteri , mesaj , args ) => {
+              if ( message . channel . type  ==  " dm " )   return ;
+  if ( message . channel . type  ! ==  " text " ) return ;
+    var Jimp =  zorunlu ( " jimp " );
+    const  Discord  =  zorunlu ( ' discord.js ' );
+    let img     =  Jimp . okumak ( mesaj . bahseder . Kullanıcılar . İlk () ?  mesajı . bahseder . Kullanıcılar . İlk (). avatarURL  :  mesajı . Yazar . avatarURL ),
+    moldura =  Jimp . oku ( " https://cdn.discordapp.com/attachments/496412678563037186/497368037607866378/gs.png " );
+    Söz ver . hepsi ([img, moldura]). sonra ( imgs  => {
+    izin moldura = Grnt [ 1 ],
+        img     = imgs [ 0 ];
+    Moldura . yeniden boyutlandırma ( 720 , 620 );  
+    img . yeniden boyutlandırma ( 720 , 615 )
+    img . kompozit (moldura, 0 , 0 ). getBuffer ( Jimp . MIME_PNG , ( err , tampon ) => {
+        eğer ( ! err)
+        mesajı . Kanal . Gönder ( yeni  Discord.Attachment (buffer));        
+    });
+});
+}
+
+ihracat . conf  = {
+  etkin :  doğru ,
+  guildOnly :  false ,
+  takma adlar : [ ' gs ' , ' galatasaray ' ],
+  permLevel :  0
+};
+
+ihracat . yardım  = {
+  adı :  ' gs ' ,
+  açıklama :  ' gs ' ,
+  kullanım :  ' gs '
+};
+
+const hastebin = zorunlu ('hastebin-gen');
+const Discord = zorunlu ('discord.js')
+
+exports.run = (müşteri, mesaj, args) => {
+  if (message.channel.type! == "text") return;
+  if (message.channel.type! == 'dm') {
+    const ozelmesajkontrol = yeni Discord.RichEmbed ()
+    .setColor (0x00AE86)
+    .setTimestamp ()
+    .setAuthor (message.author.username, message.author.avatarURL)
+    .setDescription ('Dm`ni Kontrol Edermisin?: posta kutusu:');
+    message.channel.sendEmbed (ozelmesajkontrol)}
+    const hastEmb = yeni Discord.RichEmbed ()
+ hastebin (args.join (''), "js"). sonra (r => {
+      var hastLink = r
+      const hastEmb = yeni Discord.RichEmbed ()
+      .setColor (0xFFF000)
+      .setURL (hastLink)
+      .addField ('Link:', `$ {hastLink}`)
+      .setFooter ('Gnarge Bot | Hastebin Sistemi')
+       return message.author.sendEmbed (hastEmb)
+  .})) (Console.error yakalamak;  
+   
+};
+
+
+
+exports.conf = {
+  etkin: doğru,
+  guildOnly: false,
+  takma adlar: [],
+  permLevel: 0,
+     kategori: "Kullanıcı"
+
+};
+
+exports.help = {
+  adı: 'hastebin'
+  Açıklama: 'Hastebine kod / cümle yüklersiniz.',
+  kullanım: 'hastebin [kod / cümle]'
+};
+
+ Discord  =  zorunlu ( ' discord.js ' );
+const  weather  =  zorunlu ( ' weather-js ' );
+
+ihracat . run  = ( müşteri , mesaj , args ) => {
+  hava . find ({search :  args . join ( "  " ), degreeType :  ' C ' }, function ( err , result ) {
+      if (err) mesajı . Kanal . Gönder (err);
+      if (result ===  undefined  ||  result . length  ===  0 ) {
+          mesajı . Kanal . sendEmbed ( yeni  Discord.RichEmbed (). setDescription ( ' Lütfen bir yer gir. ' ). setColor ( ' RANDOM ' ));
+          dönüş ;
+      }
+      var akım = sonuç [ 0 ]. mevcut ;
+      var konum = sonuç [ 0 ]. konum ;
+      const  embed  =  yeni  Discord.RichEmbed ()
+          . setDescription ( ` ** $ { geçerli . skytext } ** ` )
+          . setAuthor ( ' $ { akımı . observationpoint } Için Hava Durumu ' )
+          . setThumbnail ( geçerli . imageUrl )
+          . setColor ( 0x00AE86 )
+          . addField ( ' Zaman Dilimi ' , ` UTC $ { konum . timezone } ` , doğru )
+          . addField ( ' Derece Türü ' , konum . degreetype , true )
+          . AddField ( ' sıcaklıklı ' , ' $ { akımı . Sıcaklık } Derece ' , doğru )
+          . addField ( ' Hava ' , ` $ { current . feelslike } ` , doğru )
+          . addField ( ' Rüzgar ' , güncel . winddisplay , true )
+          . addField ( ' Nem ' , ` $ { current . humidity } % ` , doğru )
+          mesajı . Kanal . Gönder ({embed});
+  })
+}
+
+ihracat . conf  = {
+  etkin :  doğru ,
+  guildOnly :  false ,
+  takma adlar : [ ' YEDEK KOMUT1 ' , ' YEDEK KOMUT2 ' ],
+  permLevel :  " 0 "
+};
+
+ihracat . yardım  = {
+  adı :  " havadurumu " ,
+  açıklaması :  " hava gösterisi gösteriyor " ,
+  kullanım :  " havadurumu "
+};
